@@ -19,7 +19,7 @@ func main() {
 	subS3 := s1[2:]
 	fmt.Printf("subS3 %v len %d cap %d \n", subS3, len(subS3), cap(subS3))
 
-	// 子切片和原切片共享数据？？？
+	// todo: 子切片和原切片共享数据？？？
 	subS1 = append(subS1, 11)
 	subS1 = append(subS1, 12, 13, 14, 15, 16, 17)
 	fmt.Printf("subS1 %v len %d cap %d \n", subS1, len(subS1), cap(subS1))

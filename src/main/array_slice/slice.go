@@ -19,7 +19,8 @@ func main() {
 	s2 = append(s2, 9)
 	fmt.Printf("s2 %v len %d cap %d \n", s2, len(s2), cap(s2))
 
-	// cap > 1000 扩容 2048, 规律？
+	// cap > 1000 扩容 2048,
+	// todo: 规律？
 	s3 := make([]int, 1000, 1000)
 	s3 = append(s3, 1001)
 	fmt.Printf("s3  len %d cap %d \n", len(s3), cap(s3))
