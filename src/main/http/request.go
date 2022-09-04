@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -10,7 +11,34 @@ import (
 func main() {
 	http.HandleFunc("/body/once", readBodyOnce)
 	http.HandleFunc("/body/multi", getBodyNil)
+	http.HandleFunc("/url/query", getParams)
+	http.HandleFunc("/url/whole", wholeUrl)
+	http.HandleFunc("/header", header)
+	http.HandleFunc("/form", form)
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func form(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "before parse form %v\n", r.Form)
+	err := r.ParseForm()
+	if err != nil {
+		fmt.Fprintf(w, "parse form error %v\n", r.Form)
+	}
+	fmt.Fprintf(w, "after parse form %v\n", r.Form)
+}
+
+func header(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "header is %v\n", r.Header)
+}
+
+func wholeUrl(w http.ResponseWriter, r *http.Request) {
+	data, _ := json.Marshal(r.URL)
+	fmt.Fprintf(w, string(data))
+}
+
+func getParams(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	fmt.Fprintf(w, "query is %v \n", query)
 }
 
 func getBodyNil(w http.ResponseWriter, r *http.Request) {
