@@ -10,7 +10,7 @@ type Server interface {
 	Start(address string) error
 }
 
-// sdkHttpServer 基于 http 实现
+// sdkHttpServer 基于 http 库实现
 type sdkHttpServer struct {
 	Name string
 }
