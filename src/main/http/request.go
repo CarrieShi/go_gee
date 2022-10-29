@@ -4,18 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
 func main() {
-	http.HandleFunc("/body/once", readBodyOnce)
-	http.HandleFunc("/body/multi", getBodyNil)
-	http.HandleFunc("/url/query", getParams)
-	http.HandleFunc("/url/whole", wholeUrl)
-	http.HandleFunc("/header", header)
-	http.HandleFunc("/form", form)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	server := NewHttpServer("test-server")
+	server.RouteRW("/user/SignUpProgress", SignUpProgress)
+	server.Route("/user/signUp", SignUp)
+	server.Start(":8080")
+
+	//http.HandleFunc("/body/once", readBodyOnce)
+	//http.HandleFunc("/body/multi", getBodyNil)
+	//http.HandleFunc("/url/query", getParams)
+	//http.HandleFunc("/url/whole", wholeUrl)
+	//http.HandleFunc("/header", header)
+	//http.HandleFunc("/form", form)
+	//log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func form(w http.ResponseWriter, r *http.Request) {
