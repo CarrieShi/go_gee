@@ -13,5 +13,3 @@ type Server interface {
 type sdkHttpServer struct {
 	Name string
 }
-
-type Header map[string][]string
