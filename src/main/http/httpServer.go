@@ -45,4 +45,12 @@ func (s *sdkHttpServer) Route(pattern string,
 	})
 }
 
+func (s *sdkHttpServer) RouteWithMethod(
+	method string,
+	pattern string,
+	handleFunc func(ctx *Context)) {
+
+	http.Handle("/", )
+}
+
 ////////////////////// Route 注册路由 对比结束 //////////////////////
