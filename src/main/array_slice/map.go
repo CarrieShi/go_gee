@@ -27,6 +27,7 @@ func main() {
 		println("key not found")
 	}
 
+	// map key 顺序不定
 	for key, val := range m {
 		fmt.Printf("#{%s} ==> #{%s} \n", key, val)
 	}
