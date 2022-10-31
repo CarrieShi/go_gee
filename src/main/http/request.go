@@ -10,9 +10,13 @@ import (
 
 func main() {
 	server := NewHttpServer("test-server")
-	server.RouteRW("/user/SignUpProgress", SignUpProgress)
-	server.Route("/user/signUp", SignUp)
-	log.Fatal(server.Start(":8080"))
+
+	server.RouteBasedOnMethod("POST", "/user/signUp", SignUp)
+	log.Fatal(server.StartBasedOnMethod(":8080"))
+
+	//server.RouteRW("/user/SignUpProgress", SignUpProgress)
+	//server.Route("/user/signUp", SignUp)
+	//log.Fatal(server.Start(":8080"))
 
 	//http.HandleFunc("/body/once", readBodyOnce)
 	//http.HandleFunc("/body/multi", getBodyNil)
