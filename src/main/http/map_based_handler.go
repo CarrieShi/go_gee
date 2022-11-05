@@ -2,7 +2,7 @@ package main
 
 import "net/http"
 
-// Handler 使用组合
+// Handler 使用组合，解耦，RouteBasedOnMethod 接口
 type Handler interface {
 	http.Handler
 	RouteBasedOnMethod(
@@ -15,6 +15,19 @@ type HandlerBasedOnMap struct {
 	// key = method + url
 	// val = handleFunc 类型 func(ctx *Context)
 	handlers map[string]func(ctx *Context)
+}
+
+func (h *HandlerBasedOnMap) key(method string, pattern string) string {
+	return method + "#" + pattern
+}
+
+// RouteBasedOnMethod 解强耦合 移动至此 实现
+func (h *HandlerBasedOnMap) RouteBasedOnMethod(
+	method string,
+	pattern string,
+	handleFunc func(ctx *Context)) {
+	key := h.key(method, pattern)
+	h.handlers[key] = handleFunc
 }
 
 func (h *HandlerBasedOnMap) ServeHTTP(writer http.ResponseWriter,
@@ -30,6 +43,9 @@ func (h *HandlerBasedOnMap) ServeHTTP(writer http.ResponseWriter,
 	}
 }
 
-func (h *HandlerBasedOnMap) key(method string, pattern string) string {
-	return method + "#" + pattern
+func NewHandlerBaseOnMap() Handler {
+	return &HandlerBasedOnMap{
+		//handlers: make(map[string]func(c *Context), 128), // 预估容量，不够可自动扩容
+		handlers: make(map[string]func(c *Context)), // 预估容量，不够可自动扩容
+	}
 }

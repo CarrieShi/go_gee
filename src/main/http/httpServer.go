@@ -19,17 +19,20 @@ type Server interface {
 
 // sdkHttpServer 基于 http 库实现
 type sdkHttpServer struct {
-	Name    string
-	handler *HandlerBasedOnMap // 声明 // 强耦合 强依赖实现
+	Name string
+	//handler *HandlerBasedOnMap // 声明 // 强耦合 强依赖实现 // 改为 interface
+	handler Handler
 }
 
 func NewHttpServer(name string) Server {
 	return &sdkHttpServer{
 		Name: name,
 		// 初始化
-		handler: &HandlerBasedOnMap{
-			handlers: map[string]func(ctx *Context){},
-		},
+		//handler: &HandlerBasedOnMap{
+		//	handlers: map[string]func(ctx *Context){},
+		//},
+		// 解耦后，此处可以直接调用 NewHandlerBaseOnMap
+		handler: NewHandlerBaseOnMap(),
 	}
 }
 
@@ -59,27 +62,36 @@ func (s *sdkHttpServer) Route(pattern string,
 	})
 }
 
+// RouteBasedOnMethod 解耦后，此处只是调用了下接口
 func (s *sdkHttpServer) RouteBasedOnMethod(
 	method string,
 	pattern string,
 	handleFunc func(ctx *Context)) {
-	// 仅对 HandlerBasedOnMap handler 的赋值
-	key := s.handler.key(method, pattern)
-	s.handler.handlers[key] = handleFunc
-
-	// panic: assignment to entry in nil map
-	// 解决：NewHttpServer 内需初始化 sdkHttpServer.handler
-	// 否则 它的值是nil, 不指向任何内存地址，即报上诉的 panic
-
-	// todo: 检测重复注册问题
-
-	// handler := &HandlerBasedOnMap{}
-	// 给 handler 赋值...
-
-	// HandlerBasedOnMap 只需要注册一遍
-	// 在 sdkHttpServer 声明
-	// 在 StartBasedOnMethod 调用
-	// http.Handle("/", handler)
+	s.handler.RouteBasedOnMethod(method, pattern, handleFunc)
 }
+
+// 解强耦合 移动至 map_base_handler
+//func (s *sdkHttpServer) RouteBasedOnMethod(
+//	method string,
+//	pattern string,
+//	handleFunc func(ctx *Context)) {
+//	// 仅对 HandlerBasedOnMap handler 的赋值
+//	key := s.handler.key(method, pattern)
+//	s.handler.handlers[key] = handleFunc
+//
+//	// panic: assignment to entry in nil map
+//	// 解决：NewHttpServer 内需初始化 sdkHttpServer.handler
+//	// 否则 它的值是nil, 不指向任何内存地址，即报上诉的 panic
+//
+//	// todo: 检测重复注册问题
+//
+//	// handler := &HandlerBasedOnMap{}
+//	// 给 handler 赋值...
+//
+//	// HandlerBasedOnMap 只需要注册一遍
+//	// 在 sdkHttpServer 声明
+//	// 在 StartBasedOnMethod 调用
+//	// http.Handle("/", handler)
+//}
 
 ////////////////////// Route 注册路由 对比结束 //////////////////////
