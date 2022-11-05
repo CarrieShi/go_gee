@@ -2,6 +2,15 @@ package main
 
 import "net/http"
 
+// Handler 使用组合
+type Handler interface {
+	http.Handler
+	RouteBasedOnMethod(
+		method string,
+		pattern string,
+		handleFunc func(ctx *Context))
+}
+
 type HandlerBasedOnMap struct {
 	// key = method + url
 	// val = handleFunc 类型 func(ctx *Context)
