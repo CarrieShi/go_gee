@@ -20,7 +20,7 @@ type Server interface {
 // sdkHttpServer 基于 http 库实现
 type sdkHttpServer struct {
 	Name    string
-	handler *HandlerBasedOnMap // 声明 // 强耦合
+	handler *HandlerBasedOnMap // 声明 // 强耦合 强依赖实现
 }
 
 func NewHttpServer(name string) Server {
