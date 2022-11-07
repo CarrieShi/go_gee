@@ -2,6 +2,7 @@ package main
 
 import "net/http"
 
+// Routable httpServer 也会路由，故抽象出 Routable 接口
 type Routable interface {
 	RouteBasedOnMethod(
 		method string,
@@ -50,6 +51,11 @@ func (h *HandlerBasedOnMap) ServeHTTP(writer http.ResponseWriter,
 		writer.Write([]byte("Method Not allowed"))
 	}
 }
+
+// 确保 HandlerBasedOnMap 一定实现了 Handler ???
+// 如果 Handler 新增了方法，HandlerBasedOnMap 没有实现的情况下，ide 会报错
+// 看上去像声明 初始化
+var _ Handler = &HandlerBasedOnMap{}
 
 func NewHandlerBaseOnMap() Handler {
 	return &HandlerBasedOnMap{
