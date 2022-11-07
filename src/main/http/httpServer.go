@@ -12,8 +12,9 @@ type Server interface {
 	// Start 启动服务
 	//Start(address string) error
 
-	// RESTful
-	RouteBasedOnMethod(method string, pattern string, handleFunc func(ctx *Context))
+	// Routable RESTful
+	//RouteBasedOnMethod(method string, pattern string, handleFunc func(ctx *Context))
+	Routable
 	StartBasedOnMethod(address string) error
 }
 

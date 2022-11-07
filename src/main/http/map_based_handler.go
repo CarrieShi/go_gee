@@ -2,13 +2,21 @@ package main
 
 import "net/http"
 
-// Handler 使用组合，解耦，RouteBasedOnMethod 接口
-type Handler interface {
-	http.Handler
+type Routable interface {
 	RouteBasedOnMethod(
 		method string,
 		pattern string,
 		handleFunc func(ctx *Context))
+}
+
+// Handler 使用组合，解耦，RouteBasedOnMethod 接口
+type Handler interface {
+	http.Handler
+	Routable
+	//RouteBasedOnMethod(
+	//	method string,
+	//	pattern string,
+	//	handleFunc func(ctx *Context))
 }
 
 type HandlerBasedOnMap struct {
