@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 func main() {
 
@@ -14,6 +17,7 @@ func main() {
 	fmt.Println(ReturnClosure("JIM")())
 
 	Delay()
+	time.Sleep(time.Second)
 }
 
 func ReturnClosure(name string) func() string {
