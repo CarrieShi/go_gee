@@ -16,6 +16,7 @@ type Server interface {
 	//RouteBasedOnMethod(method string, pattern string, handleFunc func(ctx *Context))
 	Routable
 	StartBasedOnMethod(address string) error
+	// error 来自 builtin 可以在包外直接引用
 }
 
 // sdkHttpServer 基于 http 库实现

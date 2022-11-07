@@ -4,16 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
 func main() {
 	server := NewHttpServer("test-server")
 
-	server.RouteBasedOnMethod("POST", "/user/signUp", SignUp)
-	log.Fatal(server.StartBasedOnMethod(":8080"))
-
+	server.RouteBasedOnMethod(http.MethodPost, "/user/signUp", SignUp)
+	err := server.StartBasedOnMethod(":8080")
+	if err != nil {
+		panic(err)
+	}
 	//server.RouteRW("/user/SignUpProgress", SignUpProgress)
 	//server.Route("/user/signUp", SignUp)
 	//log.Fatal(server.Start(":8080"))
