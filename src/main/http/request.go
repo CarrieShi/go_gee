@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	server := NewHttpServer("test-server")
+	server := NewHttpServer("test-server", MetricsFilterBuilder)
 
 	server.RouteBasedOnMethod(http.MethodPost, "/user/signUp", SignUp)
 	err := server.StartBasedOnMethod(":8080")
