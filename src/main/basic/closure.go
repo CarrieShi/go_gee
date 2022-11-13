@@ -14,7 +14,8 @@ func main() {
 	}
 	sayHiTo()
 
-	fmt.Println(ReturnClosure("JIM")())
+	fn := ReturnClosure("JIM")
+	fmt.Println(fn())
 
 	Delay()
 	time.Sleep(time.Second)
