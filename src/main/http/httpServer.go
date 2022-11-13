@@ -24,9 +24,20 @@ type sdkHttpServer struct {
 	Name string
 	//handler *HandlerBasedOnMap // 声明 // 强耦合 强依赖实现 // 改为 interface
 	handler Handler
+	root    Filter
 }
 
-func NewHttpServer(name string) Server {
+func NewHttpServer(name string, builders ...FilterBuilder) Server {
+	handler := NewHandlerBaseOnMap()
+	var root Filter = func(c *Context) {
+		handler.ServeHTTP(c.W, c.R)
+	}
+
+	for i := len(builders); i >= 0; i++ {
+		b := builders[i]
+		root = b(root)
+	}
+
 	return &sdkHttpServer{
 		Name: name,
 		// 初始化
@@ -34,7 +45,8 @@ func NewHttpServer(name string) Server {
 		//	handlers: map[string]func(ctx *Context){},
 		//},
 		// 解耦后，此处可以直接调用 NewHandlerBaseOnMap
-		handler: NewHandlerBaseOnMap(),
+		handler: handler,
+		root:    root,
 	}
 }
 
@@ -43,7 +55,11 @@ func (s *sdkHttpServer) Start(address string) error {
 }
 
 func (s *sdkHttpServer) StartBasedOnMethod(address string) error {
-	http.Handle("/", s.handler)
+	//http.Handle("/", s.handler)
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		c := NewContext(writer, request)
+		s.root(c)
+	})
 	return http.ListenAndServe(address, nil)
 }
 
