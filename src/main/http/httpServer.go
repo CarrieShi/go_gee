@@ -33,7 +33,7 @@ func NewHttpServer(name string, builders ...FilterBuilder) Server {
 		handler.ServeHTTP(c)
 	}
 
-	for i := len(builders); i >= 0; i++ {
+	for i := len(builders) - 1; i >= 0; i++ {
 		b := builders[i]
 		root = b(root)
 	}
