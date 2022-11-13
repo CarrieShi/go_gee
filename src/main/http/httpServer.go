@@ -29,9 +29,7 @@ type sdkHttpServer struct {
 
 func NewHttpServer(name string, builders ...FilterBuilder) Server {
 	handler := NewHandlerBaseOnMap()
-	var root Filter = func(c *Context) {
-		handler.ServeHTTP(c)
-	}
+	var root Filter = handler.ServeHTTP
 
 	for i := len(builders) - 1; i >= 0; i++ {
 		b := builders[i]
