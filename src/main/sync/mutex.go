@@ -2,6 +2,10 @@ package main
 
 import "sync"
 
+func main() {
+	// todo:
+}
+
 var mutex sync.Mutex
 var rwMutex sync.RWMutex
 
