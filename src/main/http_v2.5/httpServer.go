@@ -17,8 +17,8 @@ type sdkHttpServer struct {
 	root    Filter
 }
 
-func (s *sdkHttpServer) Route(method string, pattern string, handleFunc handlerFunc) {
-	s.handler.Route(method, pattern, handleFunc)
+func (s *sdkHttpServer) Route(method string, pattern string, handlerFunc handlerFunc) error {
+	return s.handler.Route(method, pattern, handlerFunc)
 }
 
 func (s *sdkHttpServer) Start(address string) error {
