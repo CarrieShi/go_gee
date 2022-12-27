@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 )
 
 type Server interface {
 	Routable
-	start(address string) error
+	Start(address string) error
 }
 
 // sdkHttpServer 基于 http 库实现
@@ -16,7 +17,20 @@ type sdkHttpServer struct {
 	root    Filter
 }
 
+func (s *sdkHttpServer) Route(method string, pattern string, handleFunc handlerFunc) {
+	s.handler.Route(method, pattern, handleFunc)
+}
+
+func (s *sdkHttpServer) Start(address string) error {
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+		c := NewContext(writer, request)
+		s.root(c)
+	})
+	return http.ListenAndServe(address, nil)
+}
+
 func NewHttpServer(name string, builders ...FilterBuilder) Server {
+	fmt.Printf("默认使用了 NewHandlerBasedOnTree \n")
 	handler := NewHandlerBasedOnTree()
 	var root Filter = handler.ServeHTTP
 
@@ -30,12 +44,4 @@ func NewHttpServer(name string, builders ...FilterBuilder) Server {
 		handler: handler,
 		root:    root,
 	}
-}
-
-func (s *sdkHttpServer) Start(address string) error {
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-		c := NewContext(writer, request)
-		s.root(c)
-	})
-	return http.ListenAndServe(address, nil)
 }

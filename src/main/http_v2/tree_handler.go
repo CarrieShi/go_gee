@@ -1,10 +1,24 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 )
 
+type Routable interface {
+	Route(
+		method string,
+		pattern string,
+		handleFunc handlerFunc)
+}
+
+type Handler interface {
+	ServeHTTP(c *Context)
+	Routable
+}
+
+// HandlerBasedOnTree ////////////////////////////////////////////////////////////////////
 type HandlerBasedOnTree struct {
 	root *node
 }
@@ -29,12 +43,14 @@ func (h *HandlerBasedOnTree) ServeHTTP(c *Context) {
 }
 
 func (h *HandlerBasedOnTree) findRouter(path string) (handlerFunc, bool) {
+	fmt.Printf("findRouter.... \n")
 	// 去除头尾可能有的/，然后按照/切割成段
 	paths := strings.Split(strings.Trim(path, "/"), "/")
 	cur := h.root
 	for _, p := range paths {
+		matchChild, found := h.findMatchChild(cur, p)
 		// 从子节点里面查找一个匹配到当前path 的节点
-		matchChild, found := cur.findMatchChild(p)
+		//matchChild, found := cur.findMatchChildV2(p)
 		if !found {
 			return nil, false
 		}
@@ -49,16 +65,20 @@ func (h *HandlerBasedOnTree) findRouter(path string) (handlerFunc, bool) {
 
 func (h *HandlerBasedOnTree) Route(method string, pattern string,
 	handleFunc handlerFunc) {
+	fmt.Printf("Route.... \n")
 	pattern = strings.Trim(pattern, "/")
 	paths := strings.Split(pattern, "/")
 
 	cur := h.root
 	for index, path := range paths {
-		matchChild, ok := cur.findMatchChild(path)
+		// 通过根结点找
+		matchChild, ok := h.findMatchChild(cur, path)
 		if ok {
 			cur = matchChild
 		} else {
-			cur.createSubTree(paths[index:], handleFunc)
+			fmt.Printf("goto createSubTree.... \n")
+			// 通过根结点找
+			h.createSubTree(cur, paths[index:], handleFunc)
 			return
 		}
 	}
@@ -71,8 +91,9 @@ func (h *HandlerBasedOnTree) Route(method string, pattern string,
 // order/detail
 
 // paths 可以是 friends/tom/address
-func (n *node) createSubTree(paths []string, handleFn handlerFunc) {
-	cur := n
+func (h *HandlerBasedOnTree) createSubTree(root *node, paths []string, handleFn handlerFunc) {
+	fmt.Printf("createSubTree.... \n")
+	cur := root
 	for _, path := range paths {
 		nn := newNode(path)
 		// user.children = [profile, home, friends]
@@ -89,52 +110,21 @@ func newNode(path string) *node {
 	}
 }
 
-func (n *node) findMatchChild(path string) (*node, bool) {
-	var wildcardNode *node
-	for _, child := range n.children {
-		if child.path == path &&
-			child.path != "*" {
-			return child, true
-		}
-		if child.path == "*" {
-			wildcardNode = child
-		}
-	}
-	return wildcardNode, wildcardNode != nil
-}
-
-/*func (n *node) findMatchChild(path string) (*node, bool) {
-	for _, child := range n.children {
+func (h *HandlerBasedOnTree) findMatchChild(root *node,
+	path string) (*node, bool) {
+	for _, child := range root.children {
 		if child.path == path {
 			return child, true
 		}
 	}
 
 	return nil, false
-}*/
-
-func (h *HandlerBasedOnTree) validatePattern(pattern string) error {
-	// 校验 * 是否存在，如果存在，必须在最后一个，并且它前面必须是 /
-	// 即 只接受 /* 的存在，abc*、**、*/aaa/bbb 是非法的
-
-	pos := strings.Index(pattern, "*")
-	if pos > 0 {
-		if pos != len(pattern)-1 {
-			// todo:
-			// ErrorInvalidRouterPattern
-		}
-		if pattern[pos-1] != '/' {
-			// todo:
-		}
-	}
 }
 
 var _ Handler = &HandlerBasedOnTree{}
 
 func NewHandlerBasedOnTree() Handler {
 	return &HandlerBasedOnTree{
-		root: &node{
-			path: "", // todo:
-		},
+		root: &node{},
 	}
 }

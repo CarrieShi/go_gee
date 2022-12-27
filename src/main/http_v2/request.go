@@ -8,7 +8,7 @@ func main() {
 	server := NewHttpServer("test-server", MetricsFilterBuilder)
 
 	server.Route(http.MethodPost, "/user/signUp", SignUp)
-	err := server.start(":8080")
+	err := server.Start(":8080")
 	if err != nil {
 		panic(err)
 	}
